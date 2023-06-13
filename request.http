@@ -1,0 +1,61 @@
+###
+GET http://localhost:5000/api HTTP/1.1
+Content-Type: application/json
+###
+GET http://localhost:5000/api/reserva HTTP/1.1
+Content-Type: application/json
+
+###
+POST http://localhost:5000/api/Register  HTTP/1.1
+Content-Type: application/json
+
+{
+    "nombre": "Niko",
+    "correo": "nikorosalesvilla@gmail.com",
+    "contrasena": "Nr1094882996",
+    "telefono":"3217600489"
+}
+
+###
+POST http://localhost:5000/api/reserva  HTTP/1.1
+Content-Type: application/json
+
+{
+    "correo": "miguel@gmail.com",
+    "nombre": "miguel",
+    "telefono": "1234567891",
+    "colegio":"sena",
+    "pay":"boleta"
+}
+
+###
+POST  http://localhost:5000/api/carrusel  HTTP/1.1
+Content-Type: application/json
+
+{  
+    "nit":"1001",
+    "imagen": "https://res.cloudinary.com/dlohqvzri/image/upload/v1685986061/escarra_y5u581.jpg"
+}
+
+###
+DELETE http://localhost:5000/api/Nr1094882996 HTTP/1.1
+
+###
+PUT http://localhost:5000/api/angie HTTP/1.1
+Content-Type: application/json
+
+{
+    "Nombre": "niko",
+    "Correo":"Angie@gmail.com",
+    "Contrasena": "angieTeAmoooooooo"
+}
+
+
+###
+POST  http://localhost:5000/api/upcarrusel HTTP/1.1
+Content-Type: application/json
+
+{   
+    "imagen": "https://res.cloudinary.com/dlohqvzri/image/upload/v1685986061/escarra_y5u581.jpg",
+    "nit":"1001"
+}

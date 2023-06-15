@@ -1,6 +1,11 @@
 ###
-GET http://localhost:5000/api HTTP/1.1
+GET http://localhost:5000/api/Login HTTP/1.1
 Content-Type: application/json
+{
+    "correo":"nikorosalesvilla@gmail.com",
+    "contrasena":"2a66ea42"
+}
+
 ###
 GET http://localhost:5000/api/reserva HTTP/1.1
 Content-Type: application/json

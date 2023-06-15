@@ -27,19 +27,40 @@ routes.get('/reserva', (req, res) => {
     })
 })
 
-routes.get('/Login', (req, res) => {
-    const correo = req.body.correo;
-    const contrasena = req.body.contrasena;
-    req.getConnection((err,conn) =>{
-        if (err) return res.send(err)
+routes.post('/Login', (req, res) => {
+    const correo = req.body.Correo;
+    const contrasena = req.body.Contrasena;
+    req.getConnection((err, conn) => {
+        if (err) {
+            return res.send(err);
+        } else {
+            conn.query('SELECT * FROM registro WHERE Correo = ? AND Contrasena = ?', [correo, contrasena], (err, rows) => {
+                if (err) {
+                    return res.send(err);
+                }
+                if (rows.length === 0) {
+                    return res.status(404).send('No se encontraron datos');
+                }
+                res.status(200).send(rows);
+            });
+        }
+    });
+});
 
-        conn.query('SELECT * FROM registro WHERE Correo = ? AND Contrasena = ?',[correo,contrasena], (err, rows) => {
-            if(err) return res.send(err)
 
-            res.json(rows)
-        })
-    })
-})
+// routes.get('/Login', (req, res) => {
+//     const correo = req.body.correo;
+//     const contrasena = req.body.contrasena;
+//     req.getConnection((err,conn) =>{
+//         if (err) {
+//             return res.send(err)
+//         }else {conn.query('SELECT * FROM registro WHERE Correo = ? AND Contrasena = ?',[correo,contrasena], (err, rows) => {
+//             // if(err) return res.send(err)
+
+//             res.json(rows)
+//         })}
+//     })
+// })
 
 // routes.post('/Register', (req, res) => {
 
@@ -96,7 +117,7 @@ routes.post('/ActualizarContrasena', async(req, res) => {
     return password;
 }
 
-    const correo = req.body.Correo;
+    const correo = req.body.correo;
     let contrasenaNueva = String(generateRandom());
 
     let config ={
@@ -110,8 +131,8 @@ routes.post('/ActualizarContrasena', async(req, res) => {
     let mensaje = {
         from : 'granaventura@gmail.com',
         to : correo,
-        subject : 'Correo de pueba',
-        text : '¿Hola, has olvidado tu contraseña? \nPara ingresar a tu cuenta deberas usar esta contraseña: '+contrasenaNueva+' Cuando ingreses no olvides cambiar tu contraseña a una nueva contraseña que no olvides'
+        subject : 'GranAventura \nRecuperación de Contraseña.',
+        text : '¿Hola, has olvidado tu contraseña? \nPara ingresar a tu cuenta deberas usar esta contraseña: '+contrasenaNueva+'\n\nCuando ingreses no olvides cambiar tu contraseña a una nueva contraseña que no olvides.'
     }
 
     const transport = nodemailer.createTransport(config);

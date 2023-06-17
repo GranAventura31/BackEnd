@@ -47,6 +47,21 @@ routes.post('/Login', (req, res) => {
     });
 });
 
+routes.get('/Perfil', (req, res) => {
+    req.getConnection((err, conn) => {
+        if (err) {
+            return res.send(err);
+        } else {
+            conn.query('SELECT * FROM registro', (err, rows) => {
+                if (err) {
+                    return res.send(err);
+                }
+                res.send(rows);
+            });
+        }
+    });
+});
+
 
 // routes.get('/Login', (req, res) => {
 //     const correo = req.body.correo;
@@ -61,6 +76,41 @@ routes.post('/Login', (req, res) => {
 //         })}
 //     })
 // })
+
+routes.post('/Register', (req, res) => {
+    const nombre = req.body.nombre;
+    const correo = req.body.correo;
+    const contrasena = req.body.contrasena;
+    const telefono = req.body.telefono;
+    const rol = req.body.rol || "Usuario";
+
+    req.getConnection((err, conn) => {
+        if (err) {
+            return res.status(500).json({ error: 'Error de conexión a la base de datos' });
+        }
+
+        // Validar si el correo o el teléfono ya existen en la base de datos
+        conn.query('SELECT * FROM registro WHERE Correo = ? OR Telefono = ?', [correo, telefono], (err, rows) => {
+            if (err) {
+                return res.status(500).json({ error: 'Error al consultar la base de datos' });
+            }
+
+            if (rows.length > 0) {
+                // Ya existe un registro con el mismo correo o teléfono
+                return res.status(409).json({ error: 'Correo o teléfono ya existen' });
+            }
+
+            // Insertar el nuevo usuario en la base de datos
+            conn.query('INSERT INTO registro (Nombre, Correo, Contrasena, Rol, Telefono) VALUES (?, ?, ?, ?, ?)', [nombre, correo, contrasena, rol, telefono], (err, result) => {
+                if (err) {
+                    return res.status(500).json({ error: 'Error al insertar el usuario en la base de datos' });
+                }
+
+                return res.status(200).json({ response: 'Usuario insertado' });
+            });
+        });
+    });
+});
 
 // routes.post('/Register', (req, res) => {
 
@@ -78,22 +128,22 @@ routes.post('/Login', (req, res) => {
 //         })
 //     })
 // })
-routes.post('/Register', (req, res) => {
+// routes.post('/Register', (req, res) => {
 
-    const nombre = req.body.nombre;
-    const correo = req.body.correo;
-    const contrasena = req.body.contrasena;
-    const rol = req.body.rol="Usuario";
-    const telefono = req.body.telefono;
-    req.getConnection((err,conn) =>{
-        if (err) return res.send(err)
-        conn.query('CALL registroUsuario(?,?,?,?,?)',[nombre,correo,contrasena,rol,telefono], (err, rows) => {
-            if(err) return res.send(err)
+//     const nombre = req.body.nombre;
+//     const correo = req.body.correo;
+//     const contrasena = req.body.contrasena;
+//     const rol = req.body.rol="Usuario";
+//     const telefono = req.body.telefono;
+//     req.getConnection((err,conn) =>{
+//         if (err) return res.send(err)
+//         conn.query('CALL registroUsuario(?,?,?,?,?)',[nombre,correo,contrasena,rol,telefono], (err, rows) => {
+//             if(err) return res.send(err)
 
-            res.send({'response':'User Inserted'})
-        })
-    })
-})
+//             res.send({'response':'User Inserted'})
+//         })
+//     })
+// })
 
 routes.post('/reserva', (req, res) => {
 

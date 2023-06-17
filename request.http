@@ -16,7 +16,7 @@ Content-Type: application/json
 
 {
     "nombre": "Niko",
-    "correo": "nikorosalesvilla@gmail.com",
+    "correo": "nikorosales@gmail.com",
     "contrasena": "Nr1094882996",
     "telefono":"3217600489"
 }

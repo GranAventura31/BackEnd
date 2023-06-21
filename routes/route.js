@@ -3,6 +3,7 @@ const routes = express.Router()
 const nodemailer = require('nodemailer')
 const crypto = require('crypto')
 const Stripe = require('stripe')
+const multer = require('multer');
 
 routes.get('/', (req, res) => {
     req.getConnection((err,conn) =>{
@@ -290,30 +291,43 @@ routes.post('/comentarios', (req, res) => {
     });
 });
 
-routes.post('/upload', (req, res) => {
-const file = req.file;
-const { title } = req.body;
+// Configuración de Multer para almacenar los archivos en la carpeta 'uploads'
+// routes.post('/archivos', (req, res) => {
+//   const { titulo, ruta } = req.body;
 
-  // Insertar información del archivo en la base de datos
-const query = 'INSERT INTO archivos (titulo, nombre_archivo) VALUES (?, ?)';
-connection.query(query, [title, file.originalname], (error, results, fields) => {
-    if (error) throw error;
-    console.log('Archivo subido y registrado en la base de datos.');
-    res.send('Archivo subido y registrado en la base de datos.');
-});
-});
+//   // Insertar los datos en la tabla
+//   const query = 'INSERT INTO archivos (titulo, ruta) VALUES (?, ?)';
+//   connection.query(query, [titulo, ruta], (error, results) => {
+//     if (error) {
+//       console.error('Error al agregar el archivo:', error);
+//       res.status(500).send('Error al agregar el archivo');
+//     } else {
+//       console.log('Archivo agregado correctamente');
+//       res.status(200).send('Archivo agregado correctamente');
+//     }
+//   });
+// });
 
-routes.post('/upload', upload.single('file'), (req, res) => {
-const file = req.file;
-const { title } = req.body;
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/")
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname)
+  },
+})
 
-  // Insertar información del archivo en la base de datos
-const query = 'INSERT INTO archivos (titulo, nombre_archivo) VALUES (?, ?)';
-connection.query(query, [title, file.originalname], (error, results, fields) => {
-    if (error) throw error;
-    console.log('Archivo subido y registrado en la base de datos.');
-    res.send('Archivo subido y registrado en la base de datos.');
-});
-});
+const uploadStorage = multer({ storage: storage })
+
+// Single file
+routes.post("/upload/single", uploadStorage.single("file"), (req, res) => {
+  console.log(req.file)
+  return res.send("Single file")
+})
+//Multiple files
+routes.post("/upload/multiple", uploadStorage.array("file", 10), (req, res) => {
+  console.log(req.files)
+  return res.send("Multiple files")
+})
 
 module.exports = routes

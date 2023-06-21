@@ -61,21 +61,21 @@ routes.get('/Perfil', (req, res) => {
         }
     });
 });
+routes.post('/ActualizarPerfil', (req, res) => {
+    const nombre = req.body.nombre;
+    const correo = req.body.correo;
+    const contrasena = req.body.contrasena;
+    const telefono = req.body.telefono;
+    const CorreoActual = req.body.CorreoActual;
+    req.getConnection((err, conn) => {
+        if (err) return res.send(err)
+        conn.query('UPDATE registro SET Nombre = ?, Correo = ?, Contrasena = ?, Telefono = ? WHERE Correo = ?', [nombre, correo, contrasena, telefono, CorreoActual], (err, rows) => {
+            if (err) return res.send(err)
 
-
-// routes.get('/Login', (req, res) => {
-//     const correo = req.body.correo;
-//     const contrasena = req.body.contrasena;
-//     req.getConnection((err,conn) =>{
-//         if (err) {
-//             return res.send(err)
-//         }else {conn.query('SELECT * FROM registro WHERE Correo = ? AND Contrasena = ?',[correo,contrasena], (err, rows) => {
-//             // if(err) return res.send(err)
-
-//             res.json(rows)
-//         })}
-//     })
-// })
+            res.send({ 'response': 'User Updated' })
+        })
+    })
+})
 
 routes.post('/Register', (req, res) => {
     const nombre = req.body.nombre;
@@ -112,38 +112,6 @@ routes.post('/Register', (req, res) => {
     });
 });
 
-// routes.post('/Register', (req, res) => {
-
-//     const nombre = req.body.nombre;
-//     const correo = req.body.correo;
-//     const contrasena = req.body.contrasena;
-//     const telefono = req.body.telefono;
-//     const rol = req.body.rol="Usuario";
-//     req.getConnection((err,conn) =>{
-//         if (err) return res.send(err)
-//         conn.query('insert into registro (Nombre, Correo, Contrasena, Rol,Telefono) values (?,?,?,?,?)',[nombre,correo,contrasena,rol,telefono], (err, rows) => {
-//             if(err) return res.send(err)
-
-//             res.send({'response':'User Inserted'})
-//         })
-//     })
-// })
-// routes.post('/Register', (req, res) => {
-
-//     const nombre = req.body.nombre;
-//     const correo = req.body.correo;
-//     const contrasena = req.body.contrasena;
-//     const rol = req.body.rol="Usuario";
-//     const telefono = req.body.telefono;
-//     req.getConnection((err,conn) =>{
-//         if (err) return res.send(err)
-//         conn.query('CALL registroUsuario(?,?,?,?,?)',[nombre,correo,contrasena,rol,telefono], (err, rows) => {
-//             if(err) return res.send(err)
-
-//             res.send({'response':'User Inserted'})
-//         })
-//     })
-// })
 
 routes.post('/reserva', (req, res) => {
 
@@ -277,9 +245,75 @@ routes.post('/upcarrusel', (req, res) => {
         conn.query('CALL actualizarCarrusel(?,?)',[imagen,nit], (err, rows) => {
             if(err) return res.send(err)
 
-            res.send({'response':'User updated'})
+            res.status(200).send(rows)
         })
     })
 })
+
+
+
+routes.get('/comentarios', (req, res) => {
+    req.getConnection((err, conn) => {
+        if (err) return res.send(err);
+
+        conn.query('SELECT * FROM comentario', (error, rows) => {
+            if (error) {
+                console.error('Error al obtener los comentarios:', error);
+                res.status(500).json({ error: 'Error al obtener los comentarios' });
+            } else {
+                res.status(200).json(rows);
+            }
+        });
+    });
+});
+
+
+routes.post('/comentarios', (req, res) => {
+    const image = req.body.Image;
+    const nombre = req.body.Nombre;
+    const comentario = req.body.Comentario;
+
+    req.getConnection((err, conn) => {
+        if (err) {
+            console.error('Error al establecer la conexión:', err);
+            return res.status(500).json({ error: 'Error al establecer la conexión' });
+        }
+        
+        conn.query('INSERT INTO comentario (Imagen,Nombre, Comentario) VALUES (?, ?, ?)', [image,nombre,comentario], (err, rows) => {
+            if (err) {
+                console.error('Error al agregar el comentario:', err);
+                return res.status(500).json({ error: 'Error al agregar el comentario' });
+            } else {
+                res.status(200).json({ success: true, rows });
+            }
+        });
+    });
+});
+
+routes.post('/upload', (req, res) => {
+const file = req.file;
+const { title } = req.body;
+
+  // Insertar información del archivo en la base de datos
+const query = 'INSERT INTO archivos (titulo, nombre_archivo) VALUES (?, ?)';
+connection.query(query, [title, file.originalname], (error, results, fields) => {
+    if (error) throw error;
+    console.log('Archivo subido y registrado en la base de datos.');
+    res.send('Archivo subido y registrado en la base de datos.');
+});
+});
+
+routes.post('/upload', upload.single('file'), (req, res) => {
+const file = req.file;
+const { title } = req.body;
+
+  // Insertar información del archivo en la base de datos
+const query = 'INSERT INTO archivos (titulo, nombre_archivo) VALUES (?, ?)';
+connection.query(query, [title, file.originalname], (error, results, fields) => {
+    if (error) throw error;
+    console.log('Archivo subido y registrado en la base de datos.');
+    res.send('Archivo subido y registrado en la base de datos.');
+});
+});
 
 module.exports = routes

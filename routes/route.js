@@ -116,20 +116,21 @@ routes.post('/Register', (req, res) => {
 
 routes.post('/reserva', (req, res) => {
 
-    const correo = req.body.correo;
     const nombre = req.body.nombre;
+    const correo = req.body.correo;
     const telefono = req.body.telefono;
-    const colegio = req.body.colegio;
-    const pay = req.body.pay;
+    const paquete = req.body.paquete;
+    
     req.getConnection((err,conn) =>{
         if (err) return res.send(err)
-        conn.query('CALL reservaUsuario(?,?,?,?,?)',[correo,nombre,telefono,colegio,pay,], (err, rows) => {
+        conn.query('INSERT INTO reserva (Nombre, Correo, Telefono, Paquete)  VALUES (?, ?, ?, ?);',[nombre, correo, telefono, paquete], (err, rows) => {
             if(err) return res.send(err)
 
             res.send({'response':'User Inserted'})
         })
     })
 })
+
 routes.post('/ActualizarContrasena', async(req, res) => {
     const generateRandom = () => {
     const password = crypto.randomBytes(4).toString('hex');
@@ -203,7 +204,7 @@ routes.post('/checkout', async (req, res) => {
     const payment = await stripe.paymentIntents.create({
         amount,
         currency: 'USD',
-        description: "Gaming Keyboard",
+        description: "Kit Gran Aventura",
         payment_method: id,
         confirm: true 
     });
